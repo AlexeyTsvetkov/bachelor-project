@@ -36,7 +36,7 @@ class Twitter():
             raise Twitter_Rate_Limit_Exception(url)
 
         if status != 200:
-            raise Twitter_Exception('Something happened', status, str(content))
+            raise Twitter_Exception(str(content), status, url)
 
         if return_field:
             return content[return_field]
