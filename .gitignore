@@ -1,1 +1,6 @@
+*.pyc
+
 /venv/
+/docs/
+/.idea/
+/twitter_api_wrapper/auth_settings.py
