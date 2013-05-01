@@ -4,3 +4,4 @@
 /docs/
 /.idea/
 /twitter_api_wrapper/auth_settings.py
+classifiers/raw_data/*.csv
