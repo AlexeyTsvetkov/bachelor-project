@@ -1,4 +1,5 @@
 import csv
+import argparse
 
 with open('corpuses/sem_eval_corpus.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')

@@ -3,28 +3,7 @@ import oauth2
 import json
 import urlparse
 import urllib
-
-
-class Twitter_Exception(Exception):
-    """Twitter Exception"""
-
-    def __init__(self, reason):
-        self.reason = unicode(reason)
-        Exception.__init__(self, reason)
-
-    def __str__(self):
-        return self.reason
-
-
-class Twitter_Rate_Limit_Exception(Twitter_Exception):
-    """Twitter returned status code 429"""
-
-    def __init__(self):
-        self.reason = unicode('Exceed rate limit')
-        Exception.__init__(self, self.reason)
-
-    def __str__(self):
-        return self.reason
+from twitter_exceptions import *
 
 
 class Twitter():
@@ -50,15 +29,14 @@ class Twitter():
         content = json.loads(content)
         status = int(resp['status'])
 
+        if status == 404:
+            raise Twitter_Not_Found_Exception(url)
+
         if status == 429:
-            raise Twitter_Rate_Limit_Exception()
+            raise Twitter_Rate_Limit_Exception(url)
 
         if status != 200:
-            message = '''Twitter responded with status %d, when trying to reach url %s
-
-            %s''' \
-                % (status, url, str(content))
-            raise Twitter_Exception(message)
+            raise Twitter_Exception('Something happened', status, str(content))
 
         if return_field:
             return content[return_field]
