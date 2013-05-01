@@ -26,8 +26,12 @@ class Twitter():
 
     def request(self, url, return_field=None):
         resp, content = self.client.request(url)
-        content = json.loads(content)
+
+        content = json.loads(content, 'utf-8')
         status = int(resp['status'])
+
+        if status == 403:
+            raise Twitter_Forbidden_Exception(url)
 
         if status == 404:
             raise Twitter_Not_Found_Exception(url)

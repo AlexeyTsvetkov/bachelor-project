@@ -23,6 +23,14 @@ class Twitter_Rate_Limit_Exception(Twitter_Exception):
         Exception.__init__(self, self.reason, 429, url)
 
 
+class Twitter_Forbidden_Exception(Twitter_Exception):
+    """Twitter returned status code 403"""
+
+    def __init__(self, url):
+        self.reason = 'Resource access is forbidden'
+        Exception.__init__(self, self.reason, 403, url)
+
+
 class Twitter_Not_Found_Exception(Twitter_Exception):
     """Twitter returned status code 404"""
 
