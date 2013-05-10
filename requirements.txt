@@ -1,1 +1,4 @@
 oauth2==1.5.211
+numpy==1.7.1
+pyyaml==3.10
+nltk==2.0.4
