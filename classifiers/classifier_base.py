@@ -1,5 +1,9 @@
 class ClassifierBase(object):
     def __init__(self, preprocessor, feature_extractor):
+        self.preprocessor = preprocessor
+        self.feature_extractor = feature_extractor
+
+    def labels(self):
         pass
 
     def train(self, train_set):
@@ -8,8 +12,5 @@ class ClassifierBase(object):
     def classify(self, text):
         pass
 
-    def save(self, path):
-        pass
-
-    def load(self, path):
+    def batch_classify(self, test_set):
         pass
