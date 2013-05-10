@@ -1,5 +1,5 @@
 import argparse
-from classifiers.common_util import read_labelled_set
+from classifiers.util import read_labelled_set
 from classifiers.preprocessors import build_preprocessor
 
 

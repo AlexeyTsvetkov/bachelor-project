@@ -1,3 +1,5 @@
+from classifiers.util import UnicodeWriter
+
 if __name__ == "__main__" and __package__ is None:
     import os, sys
     dn = os.path.dirname
@@ -34,7 +36,7 @@ if os.path.exists(output_path):
 with open(input_path, 'r') as input_file:
     with open(output_path, 'w') as output_file:
         reader = csv.reader(input_file, delimiter=',')
-        writer = unicode_csv.UnicodeWriter(output_file, delimiter=',')
+        writer = UnicodeWriter(output_file, delimiter=',')
         twitter_client = Twitter()
 
         count = 0
