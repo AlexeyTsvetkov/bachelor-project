@@ -1,19 +1,8 @@
-from classifiers.util import UnicodeWriter
-
-if __name__ == "__main__" and __package__ is None:
-    import os, sys
-    dn = os.path.dirname
-    parent_dir = dn(dn(dn(os.path.abspath(__file__))))
-    sys.path.insert(0, parent_dir)
-    import bachelor_project
-    __package__ = str("bachelor_project")
-    del os, sys
-
 import sys
 import os
 import time
 import csv
-import unicode_csv
+from classifiers.utils import UnicodeWriter
 
 from twitter_api_wrapper.twitter import Twitter
 from twitter_api_wrapper.twitter_exceptions import *

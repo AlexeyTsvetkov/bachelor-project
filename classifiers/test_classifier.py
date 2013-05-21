@@ -1,5 +1,5 @@
 from random import shuffle
-from classifiers.util import load_classifier, read_labelled_set
+from classifier.utils import load_classifier, read_labelled_set
 
 
 def measures(label, test_set, result_set):

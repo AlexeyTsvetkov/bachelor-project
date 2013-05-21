@@ -1,5 +1,5 @@
 import argparse
-from classifiers.util import read_labelled_set
+from classifiers.utils import read_labelled_set
 from classifiers.preprocessors import build_preprocessor
 
 
@@ -32,5 +32,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     preprocessor = build_preprocessor(args)
     input_set = read_labelled_set('./raw_data/sanders_corpus.csv')
+    word_set = {}
     for row in input_set:
-        print preprocessor.preprocess(row[0])
+        text = preprocessor.preprocess(row[0])
+        for word in text.split(' '):
+            word_set[word] = word_set.get(word, 0)+1
+
+    word_freq = [(word, word_set[word]) for word in word_set.iterkeys()]
+    word_freq.sort(key=lambda x:x[1], reverse=True)
+    for word in word_freq[:50]:
+        print word
