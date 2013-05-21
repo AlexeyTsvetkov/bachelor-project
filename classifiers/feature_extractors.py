@@ -149,6 +149,6 @@ class NgramExtractorDeltaTfIdf(NgramExtractorBase):
             ngram_pos_c = max(1.0, pc / self.positive_frequency.get(ngram, pc))
             ngram_neg_c = max(1.0, nc / self.negative_frequency.get(ngram, nc))
 
-            feature_vector[ngram_position] = ngram_freq * \
+            feature_vector[ngram_position] = 1.0 * ngram_freq * \
                                              (math.log(ngram_pos_c, 2) - math.log(ngram_neg_c, 2))
         return feature_vector
