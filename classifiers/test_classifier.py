@@ -1,5 +1,4 @@
 from random import shuffle
-from classifier.utils import load_classifier, read_labelled_set
 
 
 def measures(label, test_set, result_set):
@@ -9,20 +8,20 @@ def measures(label, test_set, result_set):
         expected = test_set[i]
         observed = result_set[i]
 
-        if expected[1] == label:
-            if observed[1] == label:
+        if expected == label:
+            if observed == label:
                 tp += 1
             else:
                 fn += 1
         else:
-            if observed[1] == label:
+            if observed == label:
                 fp += 1
             else:
                 tn += 1
 
-    precision = tp / (tp + fp)
-    recall = tp / (tp + fn)
-    f1 = 2 * precision * recall / (precision + recall)
+    precision = tp / (tp + fp + 1.)
+    recall = tp / (tp + fn + 1.)
+    f1 = 2. * precision * recall / (precision + recall)
 
     return precision, recall, f1
 
@@ -56,12 +55,12 @@ def cross_validation(classifier, input_set):
     return p_avg / 10., r_avg / 10., f1_avg / 10.
 
 
+"""
 def test_classifier(classifier, input_file_path):
-    input_set = read_labelled_set(input_file_path)
 
     p_avg, r_avg, f1_avg = cross_validation(classifier, input_set)
     print '''Classifier: %s
      Input set: %s
      Precision: %f
      Recall: %f
-     F1: %f''' % (classifier, input_file_path, p_avg, r_avg, f1_avg)
+     F1: %f''' % (classifier, input_file_path, p_avg, r_avg, f1_avg)"""

@@ -38,7 +38,7 @@ class NgramExtractorBase(FeatureExtractorBase):
         self.name = 'NgramExtractorBase'
 
     def __repr__(self):
-        return '%s, ngrams=[%s]' % (self.name, ', '.join(self.ns),)
+        return '%s, ngrams=[%s]' % (self.name, ', '.join(map(str, self.ns)))
 
     def features_count(self):
         return len(self.feature_list)

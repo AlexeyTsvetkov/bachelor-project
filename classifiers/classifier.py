@@ -6,6 +6,7 @@ class ClassifierBase(object):
     def __init__(self, preprocessor, feature_extractor):
         self.preprocessor = preprocessor
         self.feature_extractor = feature_extractor
+        self.classes = []
 
     def __repr__(self):
         return 'BaseClassifier'
@@ -24,17 +25,21 @@ class ClassifierBase(object):
         """
         raise NotImplementedError('ClassifierBase.classify')
 
-    def classify_batch(self, text_set):
+    def classify_batch(self, text_set, original_class=False):
         """Classifies each text document in text_set
         returns list of classes
         """
         result_classes = []
         for text in text_set:
-            result_classes.append(self.classify_one(text))
+            if original_class:
+                result_classes.append(self.classes[self.classify_one(text)])
+            else:
+                result_classes.append(self.classify_one(text))
+        return result_classes
 
 
 class MultinomialNaiveBayes(ClassifierBase):
-    def __init__(self, preprocessor, feature_extractor):
+    def __init__(self, preprocessor, feature_extractor, alpha=1.):
         """
         Fields:
 
@@ -51,6 +56,7 @@ class MultinomialNaiveBayes(ClassifierBase):
         self.class_index = {}
         self.classes = []
         self.class_probability = []
+        self.alpha = alpha
 
     def __repr__(self):
         return 'Algorithm=MultinomialNaiveBayes, FeatureExtractor=%s' % \
@@ -77,7 +83,7 @@ class MultinomialNaiveBayes(ClassifierBase):
             class_document_count[self.class_index[c]] += 1
             encoded_labels.append(self.class_index[c])
 
-        for Class in xrange(len(labels)):
+        for Class in xrange(self.get_class_count()):
             self.class_probability.append(1.0 * class_document_count[Class] / document_count)
 
         return encoded_labels
@@ -94,25 +100,28 @@ class MultinomialNaiveBayes(ClassifierBase):
 
         for i in xrange(len(train_set)):
             text = train_set[i]
-            Class = self.class_index[classes[i]]
+            Class = classes[i]
             feature_vector = self.feature_extractor.extract(text)
-            np.add(self.features_counts[Class], feature_vector)
+            self.features_counts[Class] = np.add(self.features_counts[Class], feature_vector)
 
         for Class in xrange(self.get_class_count()):
-            self.class_feature_sum = np.sum(self.features_counts[Class])
+            self.class_feature_sum.append(np.sum(self.features_counts[Class]))
 
     def classify_one(self, text):
         result_class = -1
-        max_posterior = -1
+        max_posterior = None
+        alpha = self.alpha
 
         text = self.preprocessor.preprocess(text)
         feature_vector = self.feature_extractor.extract(text)
         for Class in xrange(self.get_class_count()):
-            prior = math.log(self.class_probability[Class], 2)
-            likelihood = np.sum(np.log2(feature_vector / self.class_feature_sum[Class]))
-            posterior = prior + likelihood
-            if posterior >= max_posterior:
+            prior = math.log(self.class_probability[Class], 10)
+            likelihood = (self.features_counts[Class] + alpha) / (self.features_counts[Class] + self.feature_count * alpha)
+            log_likelihood = np.sum(feature_vector * np.log10(likelihood))
+            posterior = prior + log_likelihood
+            if not max_posterior or posterior >= max_posterior:
                 result_class = Class
+                max_posterior = posterior
 
         if result_class == -1:
             raise RuntimeError('Result class is negative for text "%s"' % text)
