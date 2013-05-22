@@ -102,7 +102,7 @@ class MultinomialNaiveBayes(ClassifierBase):
             text = train_set[i]
             Class = classes[i]
             feature_vector = self.feature_extractor.extract(text)
-            self.features_counts[Class] = np.add(self.features_counts[Class], feature_vector)
+            self.features_counts[Class] += feature_vector
 
         for Class in xrange(self.get_class_count()):
             self.class_feature_sum.append(np.sum(self.features_counts[Class]))
