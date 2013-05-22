@@ -2,7 +2,6 @@ import cStringIO
 import csv
 import pickle
 import codecs
-from classifiers import constants
 
 
 class UTF8Recoder:
@@ -50,25 +49,17 @@ class UnicodeWriter:
 
 
 def read_labelled_set(input_file_path):
-    messages = []
+    documents = []
     labels = []
 
     with open(input_file_path, 'rt') as f_in:
         reader = UnicodeReader(f_in)
 
         for row in reader:
-            message = row[1]
-            label = row[2]
-            if label == u'positive':
-                label = constants.POSITIVE_CODE
-            elif label == u'negative':
-                label = constants.NEGATIVE_CODE
+            documents.append(row[1])
+            labels.append(row[2])
 
-            if label == constants.POSITIVE_CODE or label == constants.NEGATIVE_CODE:
-                messages.append(message)
-                labels.append(label)
-
-    return messages, labels
+    return documents, labels
 
 
 def save_classifier(path, classifier):

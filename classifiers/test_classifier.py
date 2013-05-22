@@ -40,7 +40,7 @@ def cross_validation(classifier, input_set):
         test_set = input_set[start:end]
 
         classifier.train(train_set)
-        result_set = classifier.batch_classify(test_set)
+        result_set = classifier.classify_batch(test_set)
 
         p_whole, r_whole, f1_whole = 0., 0., 0.
         for label in labels:
@@ -56,8 +56,7 @@ def cross_validation(classifier, input_set):
     return p_avg / 10., r_avg / 10., f1_avg / 10.
 
 
-def test_classifier(classifier_path, input_file_path):
-    classifier = load_classifier(classifier_path)
+def test_classifier(classifier, input_file_path):
     input_set = read_labelled_set(input_file_path)
 
     p_avg, r_avg, f1_avg = cross_validation(classifier, input_set)
@@ -65,4 +64,4 @@ def test_classifier(classifier_path, input_file_path):
      Input set: %s
      Precision: %f
      Recall: %f
-     F1: %f''' % (classifier_path, input_file_path, p_avg, r_avg, f1_avg)
+     F1: %f''' % (classifier, input_file_path, p_avg, r_avg, f1_avg)
