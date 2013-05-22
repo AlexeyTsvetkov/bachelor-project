@@ -178,7 +178,7 @@ class CombinedPreprocessor(PreprocessorBase):
         return text
 
 
-def build_preprocessor(args):
+def build_preprocessor_from_args(args):
     preprocessors = []
     if args.lowercase:
         preprocessors.append(PreprocessorLowercase())
@@ -202,5 +202,14 @@ def build_preprocessor(args):
                          PreprocessorUserEncode(), PreprocessorEmoticons(),
                          PreprocessorHashtagRemove(), PreprocessorLengtheningRemove(),
                          PreprocessorPunctuationRemove(), PreprocessorWhitespaceRemove()]
+
+    return CombinedPreprocessor(preprocessors)
+
+
+def build_combined_preprocessor():
+    preprocessors = [PreprocessorLowercase(), PreprocessorUrlEncode(),
+                     PreprocessorUserEncode(), PreprocessorEmoticons(),
+                     PreprocessorHashtagRemove(), PreprocessorLengtheningRemove(),
+                     PreprocessorPunctuationRemove(), PreprocessorWhitespaceRemove()]
 
     return CombinedPreprocessor(preprocessors)

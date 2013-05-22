@@ -5,7 +5,7 @@ from classifiers import constants
 
 
 class FeatureExtractorBase(object):
-    def __repr__(self):
+    def __str__(self):
         return 'FeatureExtractorBase'
 
     def learn(self, text_list, sentiment_list):
@@ -37,7 +37,7 @@ class NgramExtractorBase(FeatureExtractorBase):
         self.negative_documents_count = 0
         self.name = 'NgramExtractorBase'
 
-    def __repr__(self):
+    def __str__(self):
         return '%s, ngrams=[%s]' % (self.name, ', '.join(map(str, self.ns)))
 
     def features_count(self):

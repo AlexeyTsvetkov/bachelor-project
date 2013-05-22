@@ -8,7 +8,7 @@ class ClassifierBase(object):
         self.feature_extractor = feature_extractor
         self.classes = []
 
-    def __repr__(self):
+    def __str__(self):
         return 'BaseClassifier'
 
     def learn(self, train_set, classes):
@@ -58,9 +58,9 @@ class MultinomialNaiveBayes(ClassifierBase):
         self.class_probability = []
         self.alpha = alpha
 
-    def __repr__(self):
+    def __str__(self):
         return 'Algorithm=MultinomialNaiveBayes, FeatureExtractor=%s' % \
-               (self.feature_extractor,)
+               (str(self.feature_extractor),)
 
     def get_class_count(self):
         return len(self.classes)
@@ -88,35 +88,36 @@ class MultinomialNaiveBayes(ClassifierBase):
 
         return encoded_labels
 
-    def learn(self, train_set, classes):
-        train_set = map(self.preprocessor.preprocess, train_set)
-        classes = self.get_encoded_labels(classes)
+    def learn(self, documents, labels):
+        documents = map(self.preprocessor.preprocess, documents)
+        labels = self.get_encoded_labels(labels)
 
-        self.feature_extractor.learn(train_set, classes)
+        self.feature_extractor.learn(documents, labels)
         self.feature_count = self.feature_extractor.features_count()
 
         self.features_counts = np.zeros((self.get_class_count(), self.feature_count))
         self.class_feature_sum = []
 
-        for i in xrange(len(train_set)):
-            text = train_set[i]
-            Class = classes[i]
-            feature_vector = self.feature_extractor.extract(text)
+        for i in xrange(len(documents)):
+            document = documents[i]
+            Class = labels[i]
+            feature_vector = self.feature_extractor.extract(document)
             self.features_counts[Class] += feature_vector
 
         for Class in xrange(self.get_class_count()):
             self.class_feature_sum.append(np.sum(self.features_counts[Class]))
 
-    def classify_one(self, text):
+    def classify_one(self, document):
         result_class = -1
         max_posterior = None
         alpha = self.alpha
 
-        text = self.preprocessor.preprocess(text)
-        feature_vector = self.feature_extractor.extract(text)
+        document = self.preprocessor.preprocess(document)
+        feature_vector = self.feature_extractor.extract(document)
         for Class in xrange(self.get_class_count()):
             prior = math.log(self.class_probability[Class], 10)
-            likelihood = (self.features_counts[Class] + alpha) / (self.features_counts[Class] + self.feature_count * alpha)
+            likelihood = (self.features_counts[Class] + alpha) /\
+                         (self.features_counts[Class] + self.feature_count * alpha)
             log_likelihood = np.sum(feature_vector * np.log10(likelihood))
             posterior = prior + log_likelihood
             if not max_posterior or posterior >= max_posterior:
@@ -124,6 +125,7 @@ class MultinomialNaiveBayes(ClassifierBase):
                 max_posterior = posterior
 
         if result_class == -1:
-            raise RuntimeError('Result class is negative for text "%s"' % text)
+            raise RuntimeError('Result class is negative for text "%s"'
+                               % (document,))
 
         return result_class

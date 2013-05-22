@@ -1,4 +1,7 @@
+import sys
+import os
 from random import shuffle
+from classifiers.utils import read_labelled_set
 
 
 def measures(label, test_set, result_set):
@@ -21,46 +24,67 @@ def measures(label, test_set, result_set):
 
     precision = tp / (tp + fp + 1.)
     recall = tp / (tp + fn + 1.)
-    f1 = 2. * precision * recall / (precision + recall)
+    if abs(precision + recall) <= sys.float_info.epsilon:
+        f1 = 0.0
+    else:
+        f1 = 2. * precision * recall / (precision + recall)
 
     return precision, recall, f1
 
 
-def cross_validation(classifier, input_set):
-    labels = set((row[1] for row in input_set))
-    l = len(labels)
+def cross_validation(classifier, input_set, classes):
+    class_count = len(classes)
     tenth = len(input_set) / 10
 
-    shuffle(input_set)
     p_avg, r_avg, f1_avg = 0., 0., 0.
     for i in xrange(10):
         start, end = i * tenth, (i + 1) * tenth
         train_set = input_set[:start] + input_set[end:]
         test_set = input_set[start:end]
 
-        classifier.train(train_set)
-        result_set = classifier.classify_batch(test_set)
+        train_documents, train_labels = map(list, zip(*train_set))
+        classifier.learn(train_documents, train_labels)
+
+        test_documents, test_labels = map(list, zip(*test_set))
+        result_labels = classifier.classify_batch(test_documents, True)
 
         p_whole, r_whole, f1_whole = 0., 0., 0.
-        for label in labels:
-            p, r, f1 = measures(label, test_set, result_set)
+        for Class in classes:
+            p, r, f1 = measures(Class, test_labels, result_labels)
             p_whole += p
             r_whole += r
             f1_whole += f1
 
-        p_avg += p_whole / l
-        r_avg += r_whole / l
-        f1_avg += f1_whole / l
+        p_avg += p_whole / class_count
+        r_avg += r_whole / class_count
+        f1_avg += f1_whole / class_count
 
     return p_avg / 10., r_avg / 10., f1_avg / 10.
 
 
-"""
-def test_classifier(classifier, input_file_path):
+if __name__ == '__main__':
+    from classifiers.classifier import *
+    from classifiers.preprocessors import *
+    from classifiers.feature_extractors import *
 
-    p_avg, r_avg, f1_avg = cross_validation(classifier, input_set)
-    print '''Classifier: %s
-     Input set: %s
-     Precision: %f
-     Recall: %f
-     F1: %f''' % (classifier, input_file_path, p_avg, r_avg, f1_avg)"""
+    p = os.path.join(os.getcwd(), 'raw_data/sanders_corpus_pos_neg.csv')
+    docs, labels = read_labelled_set(p)
+    input_set = zip(docs, labels)
+    shuffle(input_set)
+    classes = set(labels)
+
+    preprocessor = build_combined_preprocessor()
+    feature_extractors = [NgramExtractorBoolean([1]), NgramExtractorBoolean([2]),
+                          NgramExtractorBoolean([1, 2]), NgramExtractorCount([1]),
+                          NgramExtractorCount([2]), NgramExtractorCount([1, 2])]
+    classifiers = [MultinomialNaiveBayes]
+
+    print 'Testing dataset: %s' % (p,)
+    print 'Test method: 10-fold cross-validation\n'
+    for classifier in classifiers:
+        for feature_extractor in feature_extractors:
+            predictor = classifier(preprocessor, feature_extractor)
+            print 'Classifier: %s' % (str(predictor), )
+            p, r, f1 = cross_validation(predictor, input_set, classes)
+            print 'Precision: %f, Recall: %f, F1: %f\n' % (p, r, f1)
+
