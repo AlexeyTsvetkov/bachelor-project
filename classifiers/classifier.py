@@ -59,7 +59,7 @@ class MultinomialNaiveBayes(ClassifierBase):
         self.alpha = alpha
 
     def __str__(self):
-        return 'Algorithm=MultinomialNaiveBayes, FeatureExtractor=%s' % \
+        return 'Algorithm=MultinomialNaiveBayes, %s' % \
                (str(self.feature_extractor),)
 
     def get_class_count(self):

@@ -1,19 +1,19 @@
 import numpy as np
-import math
-
-from classifiers import constants
 
 
 class FeatureExtractorBase(object):
     def __str__(self):
         return 'FeatureExtractorBase'
 
-    def learn(self, text_list, sentiment_list):
+    def features_count(self):
+        raise NotImplementedError('FeatureExtractorBase:features_count(self) is not defined')
+
+    def learn(self, documents, labels):
         """Learns features from a training set
         sentiment_list -- vector of text_list's document sentiment"""
         raise NotImplementedError('FeatureExtractorBase:learn(self, text_list) is not defined')
 
-    def extract(self, text):
+    def extract(self, document):
         """Extracts feature vector from text document"""
         raise NotImplementedError('FeatureExtractorBase:extract(self, text) is not defined')
 
@@ -31,14 +31,10 @@ class NgramExtractorBase(FeatureExtractorBase):
         self.ns = ns
         self.ngrams = {}
         self.feature_list = []
-        self.positive_frequency = {}
-        self.negative_frequency = {}
-        self.positive_documents_count = 0
-        self.negative_documents_count = 0
         self.name = 'NgramExtractorBase'
 
     def __str__(self):
-        return '%s, ngrams=[%s]' % (self.name, ', '.join(map(str, self.ns)))
+        return 'FeatureExtractor=%s (ngrams=[%s])' % (self.name, ', '.join(map(str, self.ns)))
 
     def features_count(self):
         return len(self.feature_list)
@@ -55,7 +51,7 @@ class NgramExtractorBase(FeatureExtractorBase):
             return ngram
         return None
 
-    def learn_from_one(self, words, Class):
+    def learn_from_one(self, words):
         """Learns features from one text document (list of words)"""
         for i in xrange(len(words)):
             for n in self.ns:
@@ -63,36 +59,25 @@ class NgramExtractorBase(FeatureExtractorBase):
                 if ngram and ngram not in self.ngrams:
                     self.ngrams[ngram] = len(self.feature_list)
                     self.feature_list.append(ngram)
-                if Class == constants.POSITIVE_CODE:
-                    freq = self.positive_frequency.get(ngram, 0)
-                    self.positive_frequency[ngram] = freq + 1
-                else:
-                    freq = self.negative_frequency.get(ngram, 0)
-                    self.negative_frequency[ngram] = freq + 1
 
-    def learn(self, documents, classes):
+    def learn(self, documents, labels):
         """Learns features from a training set"""
         for i in xrange(len(documents)):
             text = documents[i]
-            sentiment = classes[i]
-            if sentiment == constants.POSITIVE_CODE:
-                self.positive_documents_count += 1
-            else:
-                self.negative_documents_count += 1
 
             words = text.split()
-            self.learn_from_one(words, sentiment)
+            self.learn_from_one(words)
 
     def add_ngram(self, feature_vector, ngram):
         """Adds ngram to feature vector"""
         raise NotImplementedError('NgramExtractorBase:add_ngram() is not defined')
 
-    def extract(self, text):
+    def extract(self, document):
         """Extracts ngrams as vector [a_1, ..., a_n] where
         n is number of features in training"""
         f_num = len(self.feature_list)
         feature_vector = np.zeros((f_num,))
-        words = text.split()
+        words = document.split()
         for i in xrange(len(words)):
             for n in self.ns:
                 ngram = self.try_get_ngram(words, n, i)

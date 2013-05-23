@@ -66,25 +66,37 @@ if __name__ == '__main__':
     from classifiers.classifier import *
     from classifiers.preprocessors import *
     from classifiers.feature_extractors import *
+    from classifiers.feature_selectors import *
 
-    p = os.path.join(os.getcwd(), 'raw_data/sanders_corpus_pos_neg.csv')
-    docs, labels = read_labelled_set(p)
-    input_set = zip(docs, labels)
-    shuffle(input_set)
-    classes = set(labels)
+    def main():
+        p = '/home/altsve/projects/bachelor_project/classifiers/raw_data/sanders_corpus_pos_neg.csv'
+        docs, labels = read_labelled_set(p)
+        input_set = zip(docs, labels)
+        shuffle(input_set)
+        classes = set(labels)
 
-    preprocessor = build_combined_preprocessor()
-    feature_extractors = [NgramExtractorBoolean([1]), NgramExtractorBoolean([2]),
-                          NgramExtractorBoolean([1, 2]), NgramExtractorCount([1]),
-                          NgramExtractorCount([2]), NgramExtractorCount([1, 2])]
-    classifiers = [MultinomialNaiveBayes]
+        preprocessor = build_combined_preprocessor()
+        feature_extractors = [
+            NgramExtractorBoolean([1]),
+            NgramExtractorBoolean([2]),
+            NgramExtractorBoolean([1, 2]),
+            NgramExtractorCount([1]),
+            NgramExtractorCount([2]),
+            NgramExtractorCount([1, 2]),
+            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.2),
+            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.5),
+            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.7),
+            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 1.0)]
+        classifiers = [MultinomialNaiveBayes]
 
-    print 'Testing dataset: %s' % (p,)
-    print 'Test method: 10-fold cross-validation\n'
-    for classifier in classifiers:
-        for feature_extractor in feature_extractors:
-            predictor = classifier(preprocessor, feature_extractor)
-            print 'Classifier: %s' % (str(predictor), )
-            p, r, f1 = cross_validation(predictor, input_set, classes)
-            print 'Precision: %f, Recall: %f, F1: %f\n' % (p, r, f1)
 
+        print 'Testing dataset: %s' % (p,)
+        print 'Test method: 10-fold cross-validation\n'
+        for classifier in classifiers:
+            for feature_extractor in feature_extractors:
+                predictor = classifier(preprocessor, feature_extractor)
+                print 'Classifier: %s' % (str(predictor), )
+                p, r, f1 = cross_validation(predictor, input_set, classes)
+                print 'Precision: %f, Recall: %f, F1: %f\n' % (p, r, f1)
+
+    main()
