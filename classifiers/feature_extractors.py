@@ -5,6 +5,9 @@ class FeatureExtractorBase(object):
     def __str__(self):
         return 'FeatureExtractorBase'
 
+    def get_feature_name(self, feature_i):
+        raise NotImplementedError('FeatureExtractorBase:get_feature_name(self, feature_i) is not defined')
+
     def features_count(self):
         raise NotImplementedError('FeatureExtractorBase:features_count(self) is not defined')
 
@@ -35,6 +38,9 @@ class NgramExtractorBase(FeatureExtractorBase):
 
     def __str__(self):
         return 'FeatureExtractor=%s (ngrams=[%s])' % (self.name, ', '.join(map(str, self.ns)))
+
+    def get_feature_name(self, feature_i):
+        return self.feature_list[feature_i]
 
     def features_count(self):
         return len(self.feature_list)

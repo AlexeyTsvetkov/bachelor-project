@@ -31,10 +31,20 @@ class FeatureSelectorDeltaIdf(FeatureSelectorBase):
         super(FeatureSelectorDeltaIdf, self).__init__(feature_extractor)
         self.top = top
         self.best_features = []
-        self.name = 'DeltaTfIdf (top=%s)' % (str(top),)
+        self.name = 'DeltaIdf (top=%s)' % (str(top),)
 
     def features_count(self):
         return len(self.best_features)
+
+    def top_n_features(self, n):
+        self.features_delta.sort(key=lambda x: x[1])
+        get_name = lambda x: (self.feature_extractor.get_feature_name(x[0]), x[1])
+        absolute = lambda x: abs(x[1])
+        top = map(get_name, self.features_delta[:n])
+        top.sort(key=absolute)
+        bottom = map(get_name, self.features_delta[-n:])
+        bottom.sort(key=absolute)
+        return top, bottom
 
     def learn(self, documents, labels):
         classes = set(labels)
@@ -58,6 +68,8 @@ class FeatureSelectorDeltaIdf(FeatureSelectorBase):
 
         features_delta = np.log2(class_document_count[0] / (class_feature_counts[0] + 1.)) - \
                          np.log2(class_document_count[1] / (class_feature_counts[1] + 1.))
+
+        self.features_delta = zip(range(f_num), features_delta)
 
         delta_abs = np.absolute(features_delta)
         features = zip(range(f_num), list(delta_abs))
