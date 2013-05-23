@@ -1,0 +1,57 @@
+{% extends "Sentiment_Tag/layout.html" %}
+
+{% block Body %}
+    <div class="row">
+
+        <div class="span3">
+
+            <div class="fixed-sidebar">
+
+                <form id="dataset-form" method="post">
+                    {{ dataset_form.as_p }}
+                </form>
+
+                <form id="search-form" action="{% url "search_tweets" %}" method="post">
+                    {% csrf_token %}
+                    {{ search_form.as_p }}
+                    <button class="btn btn-primary" type="submit"><i class="icon-search"></i> Search</button>
+                </form>
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="tweet-list" class="span9 span-sidebar-fixed">
+
+    </div>
+
+
+{% endblock %}
+
+
+{% block Scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/doT.min.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            $('#nav-tag-tweets').addClass('active');
+
+            $('#search-form').submit(function(e){
+                e.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    data: $('#search-form').serialize(),
+                    url: $('#search-form').attr('action'),
+                    success: function(tweets) {
+                        console.debug(tweets);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "Dataset/layout_dataset.html" %}
+
+{% block Body %}
+
+
+    <div class="row">
+        <div class="span6">
+            <h3>{{ dataset.name }}</h3>
+
+            <p>Tweets: {{ tweet_count }}</p>
+            <p>Positive: {{ pos_tweet_count }}</p>
+            <p>Negative: {{ neg_tweet_count }}</p>
+            <p>Neutral: {{ neu_tweet_count }}</p>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="span6">
+
+            <ul>
+
+                {% for tweet in tweets %}
+
+                    <li>
+
+                        <div class="status-small">{{ tweet.text }}</div>
+
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <ul class="pager">
+            <li><a href="#">Previous</a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">Next</a></li>
+        </ul>
+
+    </div>
+
+{% endblock %}

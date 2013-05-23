@@ -1,0 +1,15 @@
+{% extends "Dataset/layout_dataset.html" %}
+
+{% block Body %}
+    <h3>You are trying to delete dataset: {{ dataset.name }}</h3>
+
+    <div class="row">
+        <div class="span12">
+            <form action="{% url "delete_dataset" dataset.id %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

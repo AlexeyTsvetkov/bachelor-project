@@ -1,0 +1,25 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block Title %}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}"/>
+</head>
+<body>
+    {% include 'Sentiment_Tag/navbar.html' %}
+
+    <div class="container">
+
+        {% block Body %}{% endblock %}
+
+    </div>
+
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    {% block Scripts %}{% endblock %}
+</body>
+</html>

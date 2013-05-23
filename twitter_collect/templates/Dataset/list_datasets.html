@@ -1,0 +1,41 @@
+{% extends "Dataset/layout_dataset.html" %}
+
+{% block Body %}
+
+    <div class="row">
+        <div class="span2">
+            <a class="btn" href="{% url "create_dataset" %}">
+                <i class="icon-plus"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="span6">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <th>Name</th>
+                    <th>Delete</th>
+                </thead>
+
+                <tbody>
+                    {% for dataset in datasets %}
+                        <tr>
+                            <td>
+                                <a href="{% url "view_dataset" dataset.id %}">
+                                    {{ dataset.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-small btn-danger" href="{% url "delete_dataset" dataset.id %}">
+                                    <i class="icon-remove icon-white"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

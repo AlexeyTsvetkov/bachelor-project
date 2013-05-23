@@ -1,0 +1,22 @@
+.positive {
+    color: #5BA68A;
+}
+
+.negative {
+    color: #D90404;
+}
+
+ul {
+    list-style: none;
+}
+
+.fixed-sidebar {
+    position: fixed;
+    left: 40px;
+    top: 60px;
+    width: 250px;
+}
+
+.span-sidebar-fixed {
+    margin-left: 150px;
+}
