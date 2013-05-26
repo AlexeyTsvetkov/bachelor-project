@@ -77,18 +77,8 @@ if __name__ == '__main__':
 
         preprocessor = build_combined_preprocessor()
         feature_extractors = [
-            NgramExtractorBoolean([1]),
-            NgramExtractorBoolean([2]),
-            NgramExtractorBoolean([1, 2]),
-            NgramExtractorCount([1]),
-            NgramExtractorCount([2]),
-            NgramExtractorCount([1, 2]),
-            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.2),
-            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.5),
-            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 0.7),
-            FeatureSelectorDeltaIdf(NgramExtractorCount([1, 2]), 1.0)]
-        classifiers = [MultinomialNaiveBayes]
-
+            NgramExtractorBoolean([1])]
+        classifiers = [MaxEnt]
 
         print 'Testing dataset: %s' % (p,)
         print 'Test method: 10-fold cross-validation\n'
