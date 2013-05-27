@@ -109,39 +109,24 @@ class FeatureSelectorDeltaIdf(FeatureSelectorBase):
         bottom.sort(key=absolute)
         return top, bottom
 
-    def learn(self, documents, labels):
+    def get_feature_scores(self, documents, labels, feature_count):
         classes = set(labels)
-        if len(classes) != 2:
-            raise ValueError('Delta TfIdf works only for 2 classes')
+        class_count = len(classes)
+        class_feature_counts = np.zeros((class_count, feature_count))
+        class_document_count = [0. for i in xrange(class_count)]
 
-        self.feature_extractor.learn(documents, labels)
-        f_num = self.feature_extractor.features_count()
-        if 0.0 < self.top < 2:
-            top_num = f_num * self.top
-        else:
-            top_num = self.top
-
-        class_feature_counts = np.zeros((2, f_num))
-        class_document_count = [0., 0.]
         for i in xrange(len(documents)):
             document, label = documents[i], labels[i]
             feature_vector = self.feature_extractor.extract(document)
             class_feature_counts[label] += feature_vector
             class_document_count[label] += 1
 
-        features_delta = np.log2(class_document_count[0] / (class_feature_counts[0] + 1.)) - \
-                         np.log2(class_document_count[1] / (class_feature_counts[1] + 1.))
+        features_deltas = []
+        for Class1 in xrange(class_count):
+            features_delta = np.log2(class_document_count[Class1] / (class_feature_counts[Class1] + 1.))
+            for Class2 in xrange(class_count):
+                if Class1 != Class2:
+                    features_delta -= np.log2(class_document_count[Class2] / (class_feature_counts[Class2] + 1.))
+            features_deltas.append(features_delta)
 
-        self.features_delta = zip(range(f_num), features_delta)
-
-        delta_abs = np.absolute(features_delta)
-        features = zip(range(f_num), list(delta_abs))
-        features.sort(key=lambda x: x[1], reverse=True)
-        self.best_features = map(lambda x: x[0], features[:int(top_num)])
-
-    def extract(self, document):
-        orig_features = self.feature_extractor.extract(document)
-        features = np.zeros((self.features_count(),))
-        for i in xrange(self.features_count()):
-            features[i] = orig_features[self.best_features[i]]
-        return features
+        return features_deltas
