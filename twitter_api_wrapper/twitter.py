@@ -1,9 +1,9 @@
-import auth_settings
 import oauth2
 import json
 import urlparse
 import urllib
-from twitter_exceptions import *
+from twitter_api_wrapper import auth_settings
+from twitter_api_wrapper.twitter_exceptions import *
 
 
 class Twitter():
@@ -50,4 +50,18 @@ class Twitter():
     def get_tweet(self, id):
         base_url = 'https://api.twitter.com/1.1/statuses/show.json'
         url = self.url_params(base_url, id=id)
+        return self.request(url)
+
+    def search(self, query, language='en', count=100, since_id=None, max_id=None):
+        base_url = 'https://api.twitter.com/1.1/search/tweets.json'
+        url = self.url_params(base_url, q=query, lang=language, count=count)
+        if since_id:
+            url = self.url_params(url, since_id=since_id)
+        if max_id:
+            url = self.url_params(url, max_id=max_id)
+        return self.request(url)
+
+    def search_next(self, next_url):
+        base_url = 'https://api.twitter.com/1.1/search/tweets.json'
+        url = base_url + next_url
         return self.request(url)
