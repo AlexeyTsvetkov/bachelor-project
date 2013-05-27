@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import random
+import os
 
 
 class ClassifierBase(object):
@@ -38,10 +38,10 @@ class ClassifierBase(object):
 
         return encoded_labels
 
-    def learn(self, train_set, classes):
+    def learn(self, documents, labels):
         """Learns from train_set
-        train_set -- list of documents
-        classes -- list of classes of corresponding documents
+        documents -- list of documents
+        labels -- list of labels of corresponding documents
         both vectors must have equal lengths
         """
         raise NotImplementedError('ClassifierBase.learn')
@@ -118,18 +118,18 @@ class MultinomialNaiveBayes(ClassifierBase):
 
 
 class MaxEnt(ClassifierBase):
-    def __init__(self, preprocessor, feature_extractor, epsilon=0.001):
+    def __init__(self, preprocessor, feature_extractor, epsilon=0.5, num_iter=5, step=0.001):
         super(MaxEnt, self).__init__(preprocessor, feature_extractor)
         self.name = 'MaxEnt'
         self.epsilon = epsilon
+        self.step = step
+        self.num_iter = num_iter
 
     def init_weights(self, class_count, feature_count):
         weights = np.zeros((class_count, feature_count))
-
-
         return weights
 
-    def learn(self, documents, labels):
+    def learn(self, documents, labels, show_progress=False):
         documents = map(self.preprocessor.preprocess, documents)
         labels = self.get_encoded_labels(labels)
         self.feature_extractor.learn(documents, labels)
@@ -141,11 +141,13 @@ class MaxEnt(ClassifierBase):
         empirical_count = np.zeros((class_count, feature_count))
         feature_vectors = map(lambda doc: self.feature_extractor.extract(doc), documents)
         self.weights = self.init_weights(class_count, feature_count)
-        step = 0.01
+        step = self.step
+        num_iter = self.num_iter
 
         for i in xrange(len(documents)):
             empirical_count[labels[i]] += feature_vectors[i]
 
+        itr = 0
         while True:
             temp_weights = np.zeros((class_count, feature_count))
             delta = 0.0
@@ -166,12 +168,14 @@ class MaxEnt(ClassifierBase):
 
                     part_derivative = empirical_count[Class][Feature] - predicted_count
                     temp_weights[Class][Feature] = self.weights[Class][Feature] + step * part_derivative
-                    delta += part_derivative ** 2
+                    delta += (part_derivative) ** 2
 
             self.weights = temp_weights
             delta = math.sqrt(delta)
-            print delta
-            if delta <= self.epsilon:
+            if show_progress:
+                print delta
+            itr += 1
+            if delta <= self.epsilon or (num_iter and itr >= num_iter):
                 break
 
     def conditional_probability(self, Class, document):
@@ -181,3 +185,43 @@ class MaxEnt(ClassifierBase):
         probability = math.exp(np.sum(self.weights[Class] * feature_vector))
         normalizer = sum(map(lambda c: math.exp(sum(self.weights[c] * feature_vector)), classes))
         return probability / normalizer
+
+
+class DictionaryClassifier(ClassifierBase):
+    def __init__(self, preprocessor, feature_extractor):
+        super(DictionaryClassifier, self).__init__(preprocessor, feature_extractor)
+        self.name = 'Dictionary'
+        dir = os.path.dirname(os.path.realpath(__file__))
+        self.positive_words = self.read_set_from_file(os.path.join(dir, 'opinion_words/positive-words.txt'))
+        self.negative_words = self.read_set_from_file(os.path.join(dir, 'opinion_words/negative-words.txt'))
+
+    def read_set_from_file(self, path):
+        result = set([])
+        with open(path, 'rt') as f:
+            for line in f:
+                result.add(line.strip())
+        return result
+
+    def learn(self, train_set, classes):
+        pass
+
+    def classify_one(self, document):
+        document = self.preprocessor.preprocess(document)
+        pos_count = 0
+        neg_count = 0
+        for word in document.split():
+            if word in self.positive_words:
+                pos_count += 1
+            if word in self.negative_words:
+                neg_count += 1
+
+        if pos_count >= neg_count:
+            return u'positive'
+        else:
+            return u'negative'
+
+    def classify_batch(self, text_set, original_class=True):
+        result = []
+        for document in text_set:
+            result.append(self.classify_one(document))
+        return result

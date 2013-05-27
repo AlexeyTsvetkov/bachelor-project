@@ -32,7 +32,7 @@ def measures(label, test_set, result_set):
     return precision, recall, f1
 
 
-def cross_validation(classifier, input_set, classes):
+def cross_validation(classifier, input_set, classes, show_progress=True):
     class_count = len(classes)
     tenth = len(input_set) / 10
 
@@ -55,6 +55,10 @@ def cross_validation(classifier, input_set, classes):
             r_whole += r
             f1_whole += f1
 
+        if show_progress:
+            print 'Results of iteration %i (average of all classes): %f (precision), %f (recall), %f (f1)' % \
+                  (i, p_whole / class_count, r_whole / class_count, f1_whole / class_count)
+
         p_avg += p_whole / class_count
         r_avg += r_whole / class_count
         f1_avg += f1_whole / class_count
@@ -76,9 +80,8 @@ if __name__ == '__main__':
         classes = set(labels)
 
         preprocessor = build_combined_preprocessor()
-        feature_extractors = [
-            NgramExtractorBoolean([1])]
-        classifiers = [MaxEnt]
+        feature_extractors = [NgramExtractorCount([1, 2])]
+        classifiers = [SvmClassifier]
 
         print 'Testing dataset: %s' % (p,)
         print 'Test method: 10-fold cross-validation\n'
