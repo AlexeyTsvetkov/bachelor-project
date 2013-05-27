@@ -117,7 +117,7 @@ class PreprocessorUserEncode(PreprocessorBase):
         self.regex = re.compile(ur'@([\w_]+)')
 
     def preprocess(self, text):
-        return self.regex.sub(ur'MENTION_\1', text)
+        return self.regex.sub(ur'USERNAME', text)
 
 
 class PreprocessorEmoticons(PreprocessorBase):

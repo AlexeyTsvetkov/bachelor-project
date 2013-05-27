@@ -80,8 +80,8 @@ if __name__ == '__main__':
         classes = set(labels)
 
         preprocessor = build_combined_preprocessor()
-        feature_extractors = [NgramExtractorCount([1, 2])]
-        classifiers = [SvmClassifier]
+        feature_extractors = [MISelector(NgramExtractorCount([1]), 600)]
+        classifiers = [MultinomialNaiveBayes]
 
         print 'Testing dataset: %s' % (p,)
         print 'Test method: 10-fold cross-validation\n'
