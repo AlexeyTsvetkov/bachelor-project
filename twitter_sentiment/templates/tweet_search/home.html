@@ -1,0 +1,120 @@
+{% extends "tweet_search/layout.html" %}
+
+{% block Body %}
+
+    <div class="textblock">
+        <h2><span class="icon-twitter blue"></span> Sentiment Tool</h2>
+
+        <p>Yet another way to search sentiment and opinions on brands or products. Enter a query below
+        to search for <span class="positive">positive</span> and
+            <span class="negative">negative</span>   opinions.</p>
+    </div>
+
+    <div class="row">
+        <div class="large-10 columns">
+            <input id="search-input" placeholder="E.g Microsoft..."/>
+        </div>
+
+        <div class="large-2 columns">
+            <a id="search-btn" class="large button expand">
+                <span class="icon-search icon-2x"></span>
+            </a>
+        </div>
+    </div>
+
+
+<div id="tabs" class="section-container vertical-tabs hidden" data-section="vertical-tabs">
+    <section>
+        <p class="title" data-section-title><a href="#">Tweets</a></p>
+        <div id="div-tweets" class="content" data-section-content>
+
+        </div>
+    </section>
+    <section>
+        <p class="title" data-section-title><a href="#">Statistics</a></p>
+        <div class="content" data-section-content>
+            <p>Content of section 2.</p>
+        </div>
+    </section>
+    <section>
+        <p class="title" data-section-title><a href="#">Summary</a></p>
+        <div class="content" data-section-content>
+            <p>Content of section 3.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block Scripts %}
+
+<script>
+    $(function(){
+        var opts = {
+            lines: 13, length: 35, width: 8, radius: 32,
+            corners: 1, rotate: 0, direction: 1, color: '#bdc3c7',
+            speed: 1, trail: 60, shadow: false, hwaccel: false,
+            className: 'spinner', zIndex: 15, top: 0, left: 0
+        };
+        var target = document.getElementById('spinner');
+        var spinner = new Spinner(opts).spin(target);
+    })
+</script>
+
+<script>
+    function ShowTweets(tweets){
+        var container = $('#div-tweets');
+        container.empty();
+        for(var i = 0, l = tweets.length; i < l; i++){
+            var tweet = tweets[i];
+            var tweet_node = '<div class="tweet ' + tweet.label + ' ">' +
+                    '<p>' + tweet.text + '</p></div>';
+            container.append(tweet_node);
+        }
+    }
+
+    var clicked = false;
+    function SearchTweets(spinner, tabs){
+        var query = $('#search-input').val();
+        if(query.length == 0){
+            return;
+        }
+
+        if(!clicked){
+            parallax = -$('#search-input').offset().top + 20;
+            $('#main-div').animate({top: parallax}, 800, 'easeInOutQuart');
+            tabs.hide();
+            tabs.removeClass('hidden');
+            clicked = true;
+        }
+
+        tabs.hide();
+        spinner.show();
+        $.ajax({
+            type: 'GET',
+            url: '/search_tweets',
+            data: {q: query},
+            success: function(data){
+                var tweets = data.tweets;
+                ShowTweets(tweets);
+                spinner.hide();
+                tabs.show();
+            }
+        });
+    }
+
+    $(function(){
+        var spinner = $('#spinner');
+        var tabs = $('#tabs');
+
+        $('#search-btn').click(function(){
+            SearchTweets(spinner, tabs);
+        });
+
+        $('#search-input').keydown(function(e) {
+            if(e.keyCode == 13) {
+                SearchTweets(spinner, tabs);
+            }
+        });
+    });
+</script>
+{% endblock %}

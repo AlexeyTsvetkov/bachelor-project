@@ -1,0 +1,140 @@
+html, body {
+    background-color: #34495e;
+    overflow-y: hidden;
+}
+
+/*-------------------------TYPOGRAPHY-------------------------------------*/
+
+
+html, body {
+    font-family: 'Raleway', sans-serif;
+}
+
+p {
+    font-size: 20px;
+}
+
+.textblock h2{
+    box-shadow: 10px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Open Sans', sans-serif;
+
+    font-weight: bold;
+    font-style: normal;
+    color: #ecf0f1;
+    text-rendering: optimizeLegibility;
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+    line-height: 1.2125em;
+}
+
+/*-------------------------/TYPOGRAPHY-------------------------------------*/
+
+
+
+/*-------------------------COLORS-------------------------------------*/
+
+.negative {
+    color: #e74c3c;
+}
+
+.positive {
+    color: #2ecc71;
+}
+
+.blue {
+    color: #3498db;
+}
+
+/*-------------------------/COLORS-------------------------------------*/
+
+
+
+/*-------------------------SEARCH-------------------------------------*/
+
+
+#search-input {
+    height: 60px;
+    width: 100%;
+    font-size: 28px;
+}
+
+#search-btn {
+    height: 60px;
+}
+
+#search-btn span.icon-search {
+    position: relative;
+    top: -15px;
+}
+
+/*-------------------------/SEARCH-------------------------------------*/
+
+
+/*-------------------------SPINNER-------------------------------------*/
+
+
+#spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 15;
+    width: 150px;
+    height: 150px;
+    margin-left: -75px;
+    margin-top: -75px;
+}
+
+/*-------------------------/SPINNER-------------------------------------*/
+
+
+
+/*-------------------------TABS-------------------------------------*/
+
+.section-container.vertical-tabs {
+    border: none;
+}
+
+.section-container > section > div {
+    border-bottom: 10px solid #ffffff;
+    border-top: 10px solid #ffffff;
+    margin-left: 50px;
+    height: 550px;
+    overflow-y: auto;
+}
+
+.tweet > p {
+    color: #ffffff;
+    margin: 10px;
+}
+
+.tweet {
+    display: block;
+    border-radius: 3px;
+}
+
+.tweet.neutral {
+    background-color: #34495e;
+}
+
+.tweet.negative {
+    background-color: #e74c3c;
+}
+
+.tweet.positive {
+    background-color: #2ecc71;
+}
+
+/*-------------------------/TABS-------------------------------------*/
+
+
+/*-------------------------STUFF-------------------------------------*/
+
+.hidden {
+    margin-left: -9999px;
+}
+
+/*-------------------------/STUFF-------------------------------------*/
