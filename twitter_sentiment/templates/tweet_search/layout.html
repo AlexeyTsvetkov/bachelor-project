@@ -8,17 +8,11 @@
     <title>Twitter sentiment</title>
 
 
-    <link rel="stylesheet" href="/static/css/foundation.min.css" />
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-
-
-
+    {% include "tweet_search/styles.html" %}
     <script src="/static/js/vendor/custom.modernizr.js"></script>
 
 </head>
+
 <body>
 
 <div id="spinner"></div>
@@ -31,18 +25,10 @@
     </div>
 </div>
 
-<script src="/static/js/vendor/jquery.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/4.1.6/js/foundation.min.js"></script>
-<script src="/static/js/foundation/foundation.alerts.js"></script>
-<script src="/static/js/foundation/foundation.section.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.1.6/d3.min.js"></script>
 
-<script>
-    $(document).foundation();
-</script>
+{% include "tweet_search/scripts.html" %}
 
 {% block Scripts %} {% endblock %}
+
 </body>
 </html>
