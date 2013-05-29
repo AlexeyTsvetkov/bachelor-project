@@ -9,9 +9,14 @@ from classifiers.feature_selectors import DeltaIdfFeatureSelector, MutualInforma
 
 def train_classifier(classifier, input_file_path, output_file_path):
     docs, labels = read_labelled_set(input_file_path)
+
+    print 'Training classifier: %s' % (str(classifier),)
     classifier.learn(docs, labels)
+
     print 'Trained, now saving...'
     save_classifier(output_file_path, classifier)
+
+    print 'Trained classifier saved to: %s' % (args.output,)
 
 
 def build_classifier_from_args(args):
@@ -82,6 +87,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     classifier = build_classifier_from_args(args)
 
-    print 'Training classifier: %s' % (str(classifier),)
     train_classifier(classifier, args.input, args.output)
-    print 'Trained classifier saved to: %s' % (args.output,)
