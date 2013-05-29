@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 
-class FeatureSelectorBase(object):
+class BaseFeatureSelector(object):
     def __init__(self, feature_extractor, top):
         self.feature_extractor = feature_extractor
         self.name = 'FeatureSelectorBase'
@@ -46,9 +46,9 @@ class FeatureSelectorBase(object):
         return features
 
 
-class MISelector(FeatureSelectorBase):
+class MutualInformationFeatureSelector(BaseFeatureSelector):
     def __init__(self, feature_extractor, top):
-        super(MISelector, self).__init__(feature_extractor, top)
+        super(MutualInformationFeatureSelector, self).__init__(feature_extractor, top)
         self.name = 'MISelector'
 
     def get_feature_scores(self, documents, labels, feature_count):
@@ -91,9 +91,9 @@ class MISelector(FeatureSelectorBase):
         return MI
 
 
-class FeatureSelectorDeltaIdf(FeatureSelectorBase):
+class DeltaIdfFeatureSelector(BaseFeatureSelector):
     def __init__(self, feature_extractor, top):
-        super(FeatureSelectorDeltaIdf, self).__init__(feature_extractor, top)
+        super(DeltaIdfFeatureSelector, self).__init__(feature_extractor, top)
         self.name = 'DeltaIdf'
 
     def features_count(self):

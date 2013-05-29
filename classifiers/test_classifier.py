@@ -73,15 +73,15 @@ if __name__ == '__main__':
     from classifiers.feature_selectors import *
 
     def main():
-        p = '/home/altsve/projects/bachelor_project/classifiers/raw_data/sanders_corpus_pos_neg.csv'
+        p = '/home/altsve/projects/bachelor_project/classifiers/raw_data/scpn.csv'
         docs, labels = read_labelled_set(p)
         input_set = zip(docs, labels)
         shuffle(input_set)
         classes = set(labels)
 
         preprocessor = build_combined_preprocessor()
-        feature_extractors = [FeatureSelectorDeltaIdf(NgramExtractorCount([1]), 600)]
-        classifiers = [MultinomialNaiveBayes]
+        feature_extractors = [DeltaIdfFeatureSelector(NgramExtractorCount([1]), 600)]
+        classifiers = [NaiveBayesClassifier]
 
         print 'Testing dataset: %s' % (p,)
         print 'Test method: 10-fold cross-validation\n'

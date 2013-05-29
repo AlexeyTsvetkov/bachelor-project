@@ -3,7 +3,7 @@ import math
 import os
 
 
-class ClassifierBase(object):
+class BaseClassifier(object):
     def __init__(self, preprocessor, feature_extractor):
         """
         Fields:
@@ -50,12 +50,16 @@ class ClassifierBase(object):
         """Probability that document belongs to Class"""
         raise NotImplementedError('ClassifierBase.conditional_probability')
 
-    def classify_one(self, document):
+    def classify_one(self, document, original_class=True):
         document = self.preprocessor.preprocess(document)
         classes = range(len(self.classes))
         prob_of_class = lambda c: self.conditional_probability(c, document)
 
-        return max(classes, key=prob_of_class)
+        result_class = max(classes, key=prob_of_class)
+        if original_class:
+            return self.classes[result_class]
+
+        return result_class
 
     def classify_batch(self, text_set, original_class=True):
         """Classifies each text document in text_set
@@ -63,16 +67,13 @@ class ClassifierBase(object):
         """
         result_classes = []
         for text in text_set:
-            if original_class:
-                result_classes.append(self.classes[self.classify_one(text)])
-            else:
-                result_classes.append(self.classify_one(text))
+            result_classes.append(self.classify_one(text, original_class))
         return result_classes
 
 
-class MultinomialNaiveBayes(ClassifierBase):
+class NaiveBayesClassifier(BaseClassifier):
     def __init__(self, preprocessor, feature_extractor, alpha=1.):
-        super(MultinomialNaiveBayes, self).__init__(preprocessor, feature_extractor)
+        super(NaiveBayesClassifier, self).__init__(preprocessor, feature_extractor)
         self.alpha = alpha
         self.name = 'MultinomialNaiveBayes'
 
@@ -117,9 +118,9 @@ class MultinomialNaiveBayes(ClassifierBase):
         return posterior
 
 
-class MaxEnt(ClassifierBase):
+class MaxEntClassifier(BaseClassifier):
     def __init__(self, preprocessor, feature_extractor, epsilon=0.5, num_iter=5, step=0.001):
-        super(MaxEnt, self).__init__(preprocessor, feature_extractor)
+        super(MaxEntClassifier, self).__init__(preprocessor, feature_extractor)
         self.name = 'MaxEnt'
         self.epsilon = epsilon
         self.step = step
@@ -187,7 +188,7 @@ class MaxEnt(ClassifierBase):
         return probability / normalizer
 
 
-class DictionaryClassifier(ClassifierBase):
+class DictionaryClassifier(BaseClassifier):
     def __init__(self, preprocessor, feature_extractor):
         super(DictionaryClassifier, self).__init__(preprocessor, feature_extractor)
         self.name = 'Dictionary'
