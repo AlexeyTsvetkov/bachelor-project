@@ -1,5 +1,12 @@
-# Django settings for twitter_sentiment project.
 import os
+import sentiment_settings
+
+rp = os.path.realpath
+dn = os.path.dirname
+jn = os.path.join
+
+ROOT_DIR = dn(dn(dn(rp(__file__))))
+CLASSIFIER_PATH = jn(ROOT_DIR, 'classifiers', 'trained_classifiers', sentiment_settings.CLASSIFIER)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -108,9 +115,6 @@ ROOT_URLCONF = 'twitter_sentiment.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'twitter_sentiment.wsgi.application'
 
-rp = os.path.realpath
-dn = os.path.dirname
-jn = os.path.join
 TEMPLATE_DIRS = (
     jn(dn(dn(rp(__file__))), 'templates')
 )

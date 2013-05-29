@@ -30,6 +30,12 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2125em;
 }
 
+#div-stats > p {
+    font-size: 36px;
+    font-family: 'Open Sans', sans-serif;
+    color: #222222;
+}
+
 /*-------------------------/TYPOGRAPHY-------------------------------------*/
 
 
@@ -42,6 +48,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .positive {
     color: #2ecc71;
+}
+
+.neutral {
+    color: #34495e;
 }
 
 .blue {
@@ -135,6 +145,20 @@ h1, h2, h3, h4, h5, h6 {
 
 .hidden {
     margin-left: -9999px;
+}
+
+.alert-info {
+    background-color: #3498db;
+    border: none;
+}
+
+.alert-error {
+    background-color: #e74c3c;
+    border: none;
+}
+
+.alert-box {
+    display: none;
 }
 
 /*-------------------------/STUFF-------------------------------------*/
