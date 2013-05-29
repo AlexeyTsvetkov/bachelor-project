@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 
-from random import choice
 import json
 
 from twitter_api_wrapper.twitter import Twitter
@@ -22,7 +21,7 @@ def search(request):
 
     if q:
         twitter = Twitter()
-        response = twitter.search(q)
+        response = twitter.search(q, 'en', 10)
         tweets = []
         tweets_set = set([])
         classifier = get_classifier()

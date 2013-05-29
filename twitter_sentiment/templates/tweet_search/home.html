@@ -2,7 +2,7 @@
 
 {% block Body %}
 
-<div class="textblock">
+<div class="textblock" xmlns="http://www.w3.org/1999/html">
     <h2><span class="icon-twitter blue"></span> Sentiment Tool</h2>
 
     <p>Yet another way to search sentiment and opinions on brands or products. Enter a query below
@@ -28,19 +28,22 @@
 <div id="tabs" class="section-container vertical-tabs hidden" data-section="vertical-tabs">
     <section>
         <p class="title" data-section-title><a href="#">Tweets</a></p>
-        <div id="div-tweets" class="content" data-section-content>
+        <div id="tweets" class="content" data-section-content>
 
         </div>
     </section>
     <section>
         <p class="title" data-section-title><a href="#">Statistics</a></p>
-        <div id="div-stats" class="content" data-section-content>
-            <p><i class="icon-smile icon-large positive"></i> :
-                <span id="positive-count" class="positive">24</span>
-                <i class="icon-meh icon-large neutral"></i> :
-                <span id="neutral-count" class="neutral">24</span>
-                <i class="icon-frown icon-large negative"></i> :
-                <span id="negative-count" class="negative">24</span></p>
+        <div id="statistics" class="content" data-section-content>
+
+            <div id="counts">
+                <p><i class="icon-smile icon-large positive"></i> :
+                <span id="positive-count" class="positive">24</span> </p>
+                <p><i class="icon-meh icon-large neutral"></i> :
+                <span id="neutral-count" class="neutral">24</span> </p>
+                <p><i class="icon-frown icon-large negative"></i> :
+                <span id="negative-count" class="negative">24</span> </p>
+            </div>
         </div>
     </section>
     <section>

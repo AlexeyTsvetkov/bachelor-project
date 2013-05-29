@@ -13,27 +13,81 @@ function ShowAlert(alert_id, message){
     $('#'+alert_id+' > span').text(message);
     var div = $('#'+alert_id);
     div.show();
-    var hide_div = function(){div.hide();}
-    return hide_div;
+    return function(){
+        div.hide();
+    }
 }
 
-function ShowInfo(message){
+function InfoMessage(message){
     return ShowAlert('alert-info', message);
 }
 
-function ShowError(message){
+function ErrorMessage(message){
     return ShowAlert('alert-error', message);
 }
 
-function ShowStats(counts){
+function Statistics(counts){
+    //pie chart code was taken from https://gist.github.com/enjalot/1203641
+
     $('#positive-count').text(counts.positive);
     $('#negative-count').text(counts.negative);
     $('#neutral-count').text(counts.neutral);
+    var sum = counts.positive+counts.negative+counts.neutral;
+
+    var data = [];
+
+    var add_data = function(color, value) {
+        var percent = (100. * value / sum).toFixed(2);
+        if(value > 0){
+            data.push({'color': color, 'label':percent + '%', 'value':value});
+        }
+    }
+
+    add_data('#2ecc71', counts.positive);
+    add_data('#e74c3c', counts.negative);
+    add_data('#34495e', counts.neutral);
+
+    var w = 300, h = 300, r = 150;
+
+    $('#statistics svg').remove();
+    var vis = d3.select('#statistics')
+        .insert('svg:svg', '#counts')
+        .data([data])
+        .attr('width', w)
+        .attr('height', h)
+        .append('svg:g')
+        .attr('transform', 'translate(' + r + ',' + r + ')');
+
+    var arc = d3.svg.arc()
+        .outerRadius(r);
+
+    var pie = d3.layout.pie()
+        .value(function(d) { return d.value; });
+
+    var arcs = vis.selectAll('g.slice')
+        .data(pie)
+        .enter()
+        .append('svg:g')
+        .attr('class', 'slice');
+
+    arcs.append('svg:path')
+        .attr('fill', function(d, i) { console.debug(d); return d.data.color; } )
+        .attr('d', arc);
+
+    arcs.append('svg:text')
+        .attr('transform', function(d) {
+            d.innerRadius = 0;
+            d.outerRadius = r;
+            return 'translate(' + arc.centroid(d) + ')';
+        })
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#fff')
+        .text(function(d, i) { return data[i].label; });
 }
 
-function ShowTweets(tweets){
+function Tweets(tweets){
     var counts = {positive: 0, neutral: 0, negative: 0}
-    var container = $('#div-tweets');
+    var container = $('#tweets');
     container.empty();
     for(var i = 0, l = tweets.length; i < l; i++){
         var tweet = tweets[i];
@@ -42,7 +96,7 @@ function ShowTweets(tweets){
             '<p>' + tweet.text + '</p></div>';
         container.append(tweet_node);
     }
-    ShowStats(counts);
+    Statistics(counts);
 }
 
 var clicked = false;
@@ -62,20 +116,20 @@ function SearchTweets(spinner, tabs){
 
     tabs.hide();
     spinner.show();
-    var hide_info = ShowInfo('Wait... It could take some time')
+    var hide_info = InfoMessage('Wait... It could take some time')
     $.ajax({
         type: 'GET',
         url: '/search_tweets',
         data: {q: query},
         success: function(data){
             var tweets = data.tweets;
-            ShowTweets(tweets);
+            Tweets(tweets);
             spinner.hide();
             tabs.show();
             hide_info();
         },
         error: function(data){
-            ShowError('Something went wrong... Please, retry later')
+            ErrorMessage('Something went wrong... Please, retry later')
         }
     });
 }
