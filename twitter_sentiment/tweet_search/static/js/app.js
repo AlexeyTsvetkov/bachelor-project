@@ -26,60 +26,52 @@ function ErrorMessage(message){
     return ShowAlert('alert-error', message);
 }
 
-function draw(words) {
-    var max = 0, min = 0;
-    for(var i = 0; i < words.length; i++){
-        if(words[i].sentiment_value > max){
-            max = words[i].sentiment_value;
-        }
-
-        if(words[i].sentiment_value < min){
-            min = words[i].sentiment_value;
-        }
-    }
-    console.debug(words);
-    var fill = d3.scale.category20();
-
-    d3.select("#summary").append("svg")
-        .attr("width", 600)
-        .attr("height", 500)
-        .append("g")
-        .attr("transform", "translate(300,250)")
-        .selectAll("text")
-        .data(words)
-        .enter().append("text")
-        .style("font-size", function(d) { return d.size + "px"; })
-        .style("font-family", "Impact")
-        .style("fill", function(d, i) {
-            var green = d3.hsl('#2ecc71');
-            var red = d3.hsl('#e74c3c');
-            if(d.sentiment_value > 0){
-                return green.toString();
-            } else {
-                return red.toString();
-            }
-        })
-        .attr("text-anchor", "middle")
-        .attr("transform", function(d) {
-            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-        })
-        .text(function(d) { return d.text; });
-}
-
 function Summary(freqs){
-    var fontSize = d3.scale.log().range([10, 40]);
+    var summary = $('#summary');
+    var summary_pos = $(summary.children('p.positive')[0]);
+    var summary_neg = $(summary.children('p.negative')[0]);
+    summary_pos.empty();
+    summary_neg.empty();
+    var fontSize = d3.scale.log().range([10, 60]);
 
-    var layout = d3.layout.cloud()
-        .size([600, 500])
-        .timeInterval(10)
-        .text(function(d) { return d[0]; })
-        .font("Impact")
-        .fontSize(function(d) {d.sentiment_value = d[1]; return fontSize(Math.abs(d[1])); })
-        .rotate(function() { return ~~(Math.random() * 2) * 90; })
-        .padding(1)
-        .on("end", draw)
-        .words(freqs)
-        .start();
+    freqs.sort(function(a, b) {
+        a = a[1]
+        b = b[1]
+        if(a > 0){
+            if(b > 0) {
+                if(Math.abs(a) > Math.abs(b)){
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } else {
+                return -1;
+            }
+        } else {
+            if(b > 0){
+                return 1;
+            } else {
+                if(Math.abs(a) > Math.abs(b)){
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+
+        }
+    });
+
+    for(var i = 0; i < freqs.length; i++) {
+        var freq = freqs[i][1];
+        var absolute_freq = Math.abs(freq);
+        var color = freq > 0 ? '#2ecc71' : '#e74c3c';
+        var span = $('<span>' + freqs[i][0] + ' </span>');
+        span.css({'font-size': fontSize(absolute_freq), 'color': color});
+
+        var summary = (freq > 0)?summary_pos:summary_neg;
+        summary.append(span);
+    }
+
 }
 
 function Statistics(counts){

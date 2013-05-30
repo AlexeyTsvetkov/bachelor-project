@@ -27,7 +27,7 @@ def get_counter(text_set, query, sw):
                     for text in text_set
                     for word in text.lower().split()
                     if word not in sw and query not in word and
-                    re.match(ur'[a-zA-Z]+[a-zA-Z0-9\-_]*', word)))
+                    re.match(ur'^[$a-zA-Z0-9_]+$', word)))
 
 
 def most_frequent_words(positive_text_set, negative_text_set, query):
