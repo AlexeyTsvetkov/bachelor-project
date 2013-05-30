@@ -52,16 +52,10 @@ class Twitter():
         url = self.url_params(base_url, id=id)
         return self.request(url)
 
-    def search(self, query, language='en', count=100, since_id=None, max_id=None):
+    def search(self, query, language='en', count=100, **kwargs):
         base_url = 'https://api.twitter.com/1.1/search/tweets.json'
-        url = self.url_params(base_url, q=query, lang=language, count=count)
-        if since_id:
-            url = self.url_params(url, since_id=since_id)
-        if max_id:
-            url = self.url_params(url, max_id=max_id)
-        return self.request(url)
-
-    def search_next(self, next_url):
-        base_url = 'https://api.twitter.com/1.1/search/tweets.json'
-        url = base_url + next_url
+        url = self.url_params(base_url, q=query, lang=language,
+                              count=count, include_entities='false', result_type='recent')
+        if 'max_id' in kwargs:
+            url = self.url_params(url, max_id=(int(kwargs['max_id']) - 1))
         return self.request(url)

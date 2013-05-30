@@ -26,6 +26,62 @@ function ErrorMessage(message){
     return ShowAlert('alert-error', message);
 }
 
+function draw(words) {
+    var max = 0, min = 0;
+    for(var i = 0; i < words.length; i++){
+        if(words[i].sentiment_value > max){
+            max = words[i].sentiment_value;
+        }
+
+        if(words[i].sentiment_value < min){
+            min = words[i].sentiment_value;
+        }
+    }
+    console.debug(words);
+    var fill = d3.scale.category20();
+
+    d3.select("#summary").append("svg")
+        .attr("width", 600)
+        .attr("height", 500)
+        .append("g")
+        .attr("transform", "translate(300,250)")
+        .selectAll("text")
+        .data(words)
+        .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) {
+            var green = d3.hsl('#2ecc71');
+            var red = d3.hsl('#e74c3c');
+            if(d.sentiment_value > 0){
+                return green.toString();
+            } else {
+                return red.toString();
+            }
+        })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+}
+
+function Summary(freqs){
+    var fontSize = d3.scale.log().range([10, 40]);
+
+    var layout = d3.layout.cloud()
+        .size([600, 500])
+        .timeInterval(10)
+        .text(function(d) { return d[0]; })
+        .font("Impact")
+        .fontSize(function(d) {d.sentiment_value = d[1]; return fontSize(Math.abs(d[1])); })
+        .rotate(function() { return ~~(Math.random() * 2) * 90; })
+        .padding(1)
+        .on("end", draw)
+        .words(freqs)
+        .start();
+}
+
 function Statistics(counts){
     //pie chart code was taken from https://gist.github.com/enjalot/1203641
 
@@ -71,7 +127,7 @@ function Statistics(counts){
         .attr('class', 'slice');
 
     arcs.append('svg:path')
-        .attr('fill', function(d, i) { console.debug(d); return d.data.color; } )
+        .attr('fill', function(d, i) { return d.data.color; } )
         .attr('d', arc);
 
     arcs.append('svg:text')
@@ -124,12 +180,15 @@ function SearchTweets(spinner, tabs){
         success: function(data){
             var tweets = data.tweets;
             Tweets(tweets);
+            Summary(data.most_frequent);
             spinner.hide();
             tabs.show();
             hide_info();
         },
         error: function(data){
-            ErrorMessage('Something went wrong... Please, retry later')
+            hide_info();
+            spinner.hide();
+            ErrorMessage('Something went wrong... Please, retry later');
         }
     });
 }
@@ -148,4 +207,4 @@ $(function(){
             SearchTweets(spinner, tabs);
         }
     });
-});
+})
