@@ -119,7 +119,7 @@ class NaiveBayesClassifier(BaseClassifier):
 
 
 class MaxEntClassifier(BaseClassifier):
-    def __init__(self, preprocessor, feature_extractor, epsilon=0.5, num_iter=5, step=0.001):
+    def __init__(self, preprocessor, feature_extractor, epsilon=0.05, num_iter=5, step=0.001):
         super(MaxEntClassifier, self).__init__(preprocessor, feature_extractor)
         self.name = 'MaxEnt'
         self.epsilon = epsilon
@@ -130,7 +130,7 @@ class MaxEntClassifier(BaseClassifier):
         weights = np.zeros((class_count, feature_count))
         return weights
 
-    def learn(self, documents, labels, show_progress=False):
+    def learn(self, documents, labels, show_progress=True):
         documents = map(self.preprocessor.preprocess, documents)
         labels = self.get_encoded_labels(labels)
         self.feature_extractor.learn(documents, labels)
@@ -172,7 +172,7 @@ class MaxEntClassifier(BaseClassifier):
                     delta += (part_derivative) ** 2
 
             self.weights = temp_weights
-            delta = math.sqrt(delta)
+            delta = math.sqrt(delta) / (class_count * feature_count)
             if show_progress:
                 print delta
             itr += 1
@@ -206,7 +206,7 @@ class DictionaryClassifier(BaseClassifier):
     def learn(self, train_set, classes):
         pass
 
-    def classify_one(self, document):
+    def classify_one(self, document, original_class=True):
         document = self.preprocessor.preprocess(document)
         pos_count = 0
         neg_count = 0
@@ -225,4 +225,24 @@ class DictionaryClassifier(BaseClassifier):
         result = []
         for document in text_set:
             result.append(self.classify_one(document))
+        return result
+
+
+class HierarchicalClassifier(BaseClassifier):
+    def __init__(self, classifier, pipelines):
+        """ Pipelines is a list of tuples (class_name, classifier)
+        if result class of first classifier equals to class_name
+        then second classifier used"""
+        self.name = 'HierarchicalClassifier'
+        self.classifier = classifier
+        self.pipelines = pipelines
+
+    def learn(self, train_set, classes):
+        pass
+
+    def classify_one(self, document, original_class=True):
+        result = self.classifier.classify_one(document)
+        for Class, classifier in self.pipelines:
+            if Class == result:
+                return classifier.classify_one(document)
         return result

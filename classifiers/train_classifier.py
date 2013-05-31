@@ -2,7 +2,7 @@ import argparse
 
 from classifiers.utils import save_classifier, read_labelled_set
 from classifiers.preprocessors import build_combined_preprocessor
-from classifiers.classifier import NaiveBayesClassifier, MaxEntClassifier, DictionaryClassifier
+from classifiers.classifier import NaiveBayesClassifier, MaxEntClassifier, DictionaryClassifier, HierarchicalClassifier
 from classifiers.feature_extractors import NgramExtractorBoolean, NgramExtractorCount
 from classifiers.feature_selectors import DeltaIdfFeatureSelector, MutualInformationFeatureSelector
 
@@ -17,6 +17,21 @@ def train_classifier(classifier, input_file_path, output_file_path):
     save_classifier(output_file_path, classifier)
 
     print 'Trained classifier saved to: %s' % (args.output,)
+
+
+def build_hierarchical():
+    docs, labels = read_labelled_set('raw_data/scpn.csv')
+    preprocessor = build_combined_preprocessor()
+    extractor = NgramExtractorCount([1, 2])
+    pos_neg = NaiveBayesClassifier(preprocessor, extractor)
+    pos_neg.learn(docs, labels)
+
+    docs, labels = read_labelled_set('raw_data/sc.csv')
+    obj_subj = NaiveBayesClassifier(preprocessor, extractor)
+    obj_subj.learn(docs, labels)
+
+    result_classifier = HierarchicalClassifier(obj_subj, [(u'subjective', pos_neg)])
+    save_classifier('trained_classifiers/three_class_hierarchical.obj', result_classifier)
 
 
 def build_classifier_from_args(args):

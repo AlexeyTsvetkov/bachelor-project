@@ -10,8 +10,12 @@ from twitter_api_wrapper.twitter import Twitter
 from classifiers.utils import load_classifier
 
 
-def get_classifier():
-    return load_classifier(settings.CLASSIFIER_PATH)
+def remove_url(text):
+    url_pattern = ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))'
+    return re.sub(url_pattern, '', text)
+
+def get_classifier(classifier_path):
+    return load_classifier(classifier_path)
 
 
 def stop_words():
@@ -52,7 +56,7 @@ def search(request):
         tweets_set = set([])
         positive = set([])
         negative = set([])
-        classifier = get_classifier()
+        classifier = get_classifier(settings.CLASSIFIER_PATH)
 
         max_id = None
         for i in xrange(1):
@@ -63,17 +67,19 @@ def search(request):
 
             for status in response[u'statuses']:
                 text = status[u'text']
+                text_wo_url = remove_url(text)
                 if not max_id or int(status[u'id']) < max_id:
                     max_id = int(status[u'id'])
-                if text not in tweets_set:
+                if text_wo_url not in tweets_set:
                     label = classifier.classify_one(text)
-                    if label == u'positive':
-                        positive.add(text)
-                    elif label == u'negative':
-                        negative.add(text)
 
-                    tweets.append({'text': text, 'label': label})
-                    tweets_set.add(text)
+                    if label == u'positive':
+                        positive.add(text_wo_url)
+                    elif label == u'negative':
+                        negative.add(text_wo_url)
+
+                    tweets.append({'text': text_wo_url, 'label': label})
+                    tweets_set.add(text_wo_url)
 
         freq = most_frequent_words(positive, negative, query)
         result = { 'tweets': tweets, 'most_frequent': freq }

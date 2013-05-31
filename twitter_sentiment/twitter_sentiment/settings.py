@@ -7,6 +7,7 @@ jn = os.path.join
 
 ROOT_DIR = dn(dn(dn(rp(__file__))))
 CLASSIFIER_PATH = jn(ROOT_DIR, 'classifiers', 'trained_classifiers', sentiment_settings.CLASSIFIER)
+NEUTRAL_CLASSIFIER_PATH = jn(ROOT_DIR, 'classifiers', 'trained_classifiers', sentiment_settings.NEUTRAL_CLASSIFIER)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
