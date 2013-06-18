@@ -68,7 +68,7 @@ def build_classifier_from_args(args):
 
     return classifier
 
-if __name__ == '__main__':
+def get_args_parser():
     parser = argparse.ArgumentParser(description='Training a sentiment classifier')
     parser.add_argument('--algorithm', choices=['NaiveBayes', 'MaxEnt', 'Dictionary'],
                         required=True,
@@ -95,9 +95,14 @@ if __name__ == '__main__':
                         help='Input path (training dataset)')
 
     parser.add_argument('--output', type=str,
-                        required=True,
+                        required=False,
                         help='Output path (classifier will be saved there)')
 
+    return parser
+
+
+if __name__ == '__main__':
+    parser = get_args_parser()
 
     args = parser.parse_args()
     classifier = build_classifier_from_args(args)

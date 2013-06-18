@@ -119,7 +119,7 @@ class NaiveBayesClassifier(BaseClassifier):
 
 
 class MaxEntClassifier(BaseClassifier):
-    def __init__(self, preprocessor, feature_extractor, epsilon=0.05, num_iter=5, step=0.001):
+    def __init__(self, preprocessor, feature_extractor, epsilon=0.05, num_iter=1, step=0.001):
         super(MaxEntClassifier, self).__init__(preprocessor, feature_extractor)
         self.name = 'MaxEnt'
         self.epsilon = epsilon
@@ -130,7 +130,7 @@ class MaxEntClassifier(BaseClassifier):
         weights = np.zeros((class_count, feature_count))
         return weights
 
-    def learn(self, documents, labels, show_progress=True):
+    def learn(self, documents, labels, show_progress=False):
         documents = map(self.preprocessor.preprocess, documents)
         labels = self.get_encoded_labels(labels)
         self.feature_extractor.learn(documents, labels)

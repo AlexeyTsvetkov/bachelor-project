@@ -71,25 +71,25 @@ if __name__ == '__main__':
     from classifiers.preprocessors import *
     from classifiers.feature_extractors import *
     from classifiers.feature_selectors import *
+    from classifiers.train_classifier import get_args_parser, build_classifier_from_args
 
     def main():
-        p = '/home/altsve/projects/bachelor_project/classifiers/raw_data/sc.csv'
-        docs, labels = read_labelled_set(p)
+        parser = get_args_parser()
+
+        args = parser.parse_args()
+        classifier = build_classifier_from_args(args)
+
+        docs, labels = read_labelled_set(args.input)
         input_set = zip(docs, labels)
         shuffle(input_set)
         classes = set(labels)
 
-        preprocessor = build_combined_preprocessor()
-        feature_extractors = [NgramExtractorCount([1])]
-        classifiers = [MaxEntClassifier]
-
-        print 'Testing dataset: %s' % (p,)
+        print 'Testing dataset: %s' % (args.input,)
         print 'Test method: 10-fold cross-validation\n'
-        for classifier in classifiers:
-            for feature_extractor in feature_extractors:
-                predictor = classifier(preprocessor, feature_extractor)
-                print 'Classifier: %s' % (str(predictor), )
-                p, r, f1 = cross_validation(predictor, input_set, classes)
-                print 'Precision: %f, Recall: %f, F1: %f\n' % (p, r, f1)
+        print 'Classifier: %s' % (str(classifier), )
+
+        p, r, f1 = cross_validation(classifier, input_set, classes)
+        print 'After 10-fold-average'
+        print 'Precision: %f, Recall: %f, F1: %f\n' % (p, r, f1)
 
     main()
